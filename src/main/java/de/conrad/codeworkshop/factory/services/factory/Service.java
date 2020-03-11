@@ -18,4 +18,8 @@ class Service {
         order.setStatus(OrderStatus.IN_PROGRESS);
         manufacturingQueue.add(order);
     }
+
+    public ConcurrentLinkedQueue<Order> getManufacturingQueue() {
+        return manufacturingQueue;
+    }
 }

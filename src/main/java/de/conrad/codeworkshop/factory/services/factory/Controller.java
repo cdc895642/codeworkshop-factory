@@ -1,5 +1,6 @@
 package de.conrad.codeworkshop.factory.services.factory;
 
+import de.conrad.codeworkshop.factory.services.order.AsyncWorker;
 import de.conrad.codeworkshop.factory.services.order.api.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,11 @@ import static org.springframework.http.HttpStatus.OK;
 public class Controller {
 
     private final Service factoryService;
+    private final AsyncWorker asyncWorker;
 
     @Autowired
-    public Controller(final Service factoryService) {
-
+    public Controller(final Service factoryService, final AsyncWorker asyncWorker) {
+        this.asyncWorker = asyncWorker;
         this.factoryService = factoryService;
     }
 
@@ -32,6 +34,7 @@ public class Controller {
 
         try {
             factoryService.enqueue(order);
+            asyncWorker.completeOrders(factoryService.getManufacturingQueue());
         } catch (final Exception exception) {
             response = INTERNAL_SERVER_ERROR;
         }

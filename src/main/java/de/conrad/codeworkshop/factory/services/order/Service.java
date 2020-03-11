@@ -7,11 +7,15 @@ import de.conrad.codeworkshop.factory.services.order.api.OrderNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.math.BigInteger;
 import java.util.Random;
+import java.util.Set;
 
 import static de.conrad.codeworkshop.factory.services.order.api.OrderConfirmation.BLANK_ORDER_CONFIRMATION;
 import static de.conrad.codeworkshop.factory.services.order.api.OrderStatus.ACCEPTED;
+import static de.conrad.codeworkshop.factory.services.order.api.OrderStatus.DECLINED;
 
 /**
  * @author Andreas Hartmann
@@ -20,10 +24,13 @@ import static de.conrad.codeworkshop.factory.services.order.api.OrderStatus.ACCE
 public class Service {
 
     private final Controller factoryController;
+    private final Validator validator;
 
     @Autowired
-    public Service(de.conrad.codeworkshop.factory.services.factory.Controller factoryController) {
+    public Service(de.conrad.codeworkshop.factory.services.factory.Controller factoryController,
+                   Validator validator) {
         this.factoryController = factoryController;
+        this.validator = validator;
     }
 
     /**
@@ -33,6 +40,14 @@ public class Service {
     @PostMapping("/create")
     public OrderConfirmation createOrder(final Order order) {
         order.validate();
+
+        //use javax.validation
+        Set<ConstraintViolation<Order>> orderValidationSet = validator.validate(order);
+        if (orderValidationSet.size() == 0) {
+            order.setStatus(ACCEPTED);
+        } else {
+            order.setStatus(DECLINED);
+        }
 
         final OrderConfirmation orderConfirmation;
 

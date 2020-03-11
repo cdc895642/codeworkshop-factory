@@ -20,7 +20,7 @@ public class OrderConfirmation {
 
     public OrderConfirmation(final OrderNumber orderNumber) {
         this.orderNumber = generate();
-
+        //TODO - this looks strange
         this.status = null == orderNumber ? ACCEPTED : DECLINED;
     }
 
